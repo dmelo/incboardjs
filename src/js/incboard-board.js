@@ -227,7 +227,7 @@
             factorX = cols / realWidth;
             factor = Math.min(factorX, factorY);
 
-            console.log('real (' + cols + ', ' + rows + '). transformed (' + realWidth + ', ' + realHeight + ')');
+            // console.log('real (' + cols + ', ' + rows + '). transformed (' + realWidth + ', ' + realHeight + ')');
 
             if (factor * cellSizeX > 120 || factor * cellSizeY > 90 || factor < 0) {
                 newCellSizeX = 120;
@@ -241,7 +241,7 @@
             newTop = (1 - factor) * cellSizeY * rows * 0.5;
             newLeft = (1 - factor) * cellSizeX * cols * 0.5;
 
-            console.log('realHeight: ' + realHeight + ". realWidth: " + realWidth + ". newCellSize(" + newCellSizeX + ", " + newCellSizeY + ") newTop: " + newTop + ". newLeft: " + newLeft);
+            // console.log('realHeight: ' + realHeight + ". realWidth: " + realWidth + ". newCellSize(" + newCellSizeX + ", " + newCellSizeY + ") newTop: " + newTop + ". newLeft: " + newLeft);
 
             $('#incboard').css('width', (newCellSizeX * cols) + 'px');
             $('#incboard').css('top', (newTop + topPadding) + 'px');
@@ -302,7 +302,7 @@
             var list = [];
 
             for (var id in listByObjId) {
-                list.push(id);
+                list.push(parseInt(id));
             }
 
             return list;
@@ -312,8 +312,6 @@
             var ret,
                 cell,
                 intPos;
-
-            console.log('Rows: ' + rows + ', cols: ' + cols);
 
             if ('undefined' === typeof pos) {
                 pos = [Math.floor(cols / 2), Math.floor(rows / 2)];
@@ -483,7 +481,6 @@
             } catch (e) {
                 console.log(e);
             }
-            console.log("fsck end");
 
             return ret;
         };

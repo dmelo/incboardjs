@@ -35,7 +35,6 @@
                 resultSet = new $.ResultSet(),
                 ret;
 
-            console.log(v);
             ret = ('album' === v.type) ? $(resultSet.getAlbumSquare(v)) : $(resultSet.getMusicSquare(v));
 
             ret.addClass('music-square incboard-cell incboard-col-' + self.col + ' incboard-row-' + self.row);
@@ -55,7 +54,6 @@
 
             // If the element already exists then the only attribute that can chage is the position.
             if (e.length !== 0) {
-                console.log
                 e.removeClass();
                 e.addClass('incboard-cell incboard-row-' + self.row + ' incboard-col-' + self.col);
                 if ('isCenter' in v && true === v.isCenter) {

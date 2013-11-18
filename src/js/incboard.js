@@ -23,7 +23,7 @@
     function IncBoard() {
         this.shiftList = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
         this.ibb = new $.IncBoardBoard();
-        this.stochasticLength = 15;
+        this.stochasticLength = 0;
         this.clean();
         this.log = new Log();
     }
@@ -70,12 +70,12 @@
         var start = new Date().getTime();
         var self = this,
             list = [],
-            idList = this.ibb.getIdList();
-
+            idList = this.ibb.getIdList(),
+            totalLength = idList.length;
 
         for (var key in this.ibb.getByPos(center)) {
             var item = this.ibb.getByPos(center)[key],
-                id = item.objId;
+                id = parseInt(item.objId);
             list.push(id);
             idList.splice(idList.indexOf(id), 1);
         }
@@ -84,17 +84,23 @@
             var pos = [center[0] + shift[0], center[1] + shift[1]];
             for (var key in self.ibb.getByPos(pos)) {
                 var item = self.ibb.getByPos(pos)[key],
-                    id = item.objId;
+                    id = parseInt(item.objId);
 
-                list.push(id);
-                idList.splice(idList.indexOf(id), 1);
+                if (-1 === list.indexOf(id)) {
+                    list.push(id);
+                    idList.splice(idList.indexOf(id), 1);
+                }
             }
         });
 
-        while (list.length < this.stochasticLength && idList.length > 0) {
-            var rid = Math.floor(Math.random() * idList.length);
-            list.push(idList[rid]);
-            idList.splice(rid, 1);
+        while (list.length < this.stochasticLength * totalLength && idList.length > 0) {
+            var rid = Math.floor(Math.random() * idList.length),
+                id = parseInt(idList[rid]);
+
+            if (-1 === list.indexOf(id)) {
+                list.push(id);
+                idList.splice(rid, 1);
+            }
         }
 
         var end = new Date().getTime();
@@ -159,13 +165,20 @@
             }
         }
 
+        /*
+        console.log("getNDRank");
+        for (var i in rank) {
+            console.log("id: " + rank[i] + ". similarity: " + self.similarity[objId][rank[i]]);
+        }
+        */
+
         return rank;
     }
 
     // Calculate Werr of element v.
     IncBoard.prototype.calcError = function(v, musicList) {
-        var s0 = new Date().getTime();
-        var werr = 0,
+        var s0 = new Date().getTime(),
+            werr = 0,
             rank2D = this.get2DRank(v, musicList),
             s1 = new Date().getTime(),
             rankND = this.getNDRank(v, musicList),
@@ -176,7 +189,7 @@
         for (var r2 in rank2D) {
             var item = rank2D[r2];
             rN = rankND.indexOf(item);
-            if (rN !== r2) {
+            if (rN != r2) {
                 werr += Math.abs((rN - r2) * (self.ibb.getSize() - rN));
             }
         }
@@ -186,10 +199,28 @@
         return werr;
     }
 
+    IncBoard.prototype.calcCountingError = function(v, musicList) {
+        var cerr = 0,
+            rank2D = this.get2DRank(v, musicList),
+            rankND = this.getNDRank(v, musicList),
+            rN = 0,
+            self = this;
+
+        for (var r2 in rank2D) {
+            var item = rank2D[r2];
+            rN = rankND.indexOf(item);
+            if (rN != r2) {
+                cerr += musicList.length - rN;
+            }
+        }
+
+        return cerr;
+    }
+
     IncBoard.prototype.resolveConflict = function(mostSimilar, newMusic, visitedCells) {
         var self = this;
 
-        self.log.debug("resolveConflict " + mostSimilar.objId + " " + newMusic.objId + ": " + visitedCells);
+        // self.log.debug("resolveConflict " + mostSimilar.objId + " " + newMusic.objId + ": " + visitedCells);
         if ('undefined' === typeof mostSimilar || 'undefined' === typeof newMusic) {
         }
 
@@ -199,6 +230,7 @@
             bestWerr = 10000000,
             bestState = 0,
             occupancy = 1000,
+            bestCountingError = 1000000000,
             musicList = this.stochasticItems(ncPos);
 
 
@@ -206,22 +238,39 @@
             self.shiftList.forEach(function(shift) {
                 var pos = [ncPos[0] + shift[0], ncPos[1] + shift[1]];
                 if (-1 === visitedCells.indexOf(self.ibb.posToInt(pos))) {
+                    var currentWerr;
                     if(0 == state) {
                         self.ibb.setPos(mostSimilar.objId, ncPos);
                         self.ibb.setPos(newMusic.objId, pos);
+                        // currentWerr = self.calcError(newMusic, pos);
                     } else {
                         self.ibb.setPos(mostSimilar.objId, pos);
                         self.ibb.setPos(newMusic.objId, ncPos);
+                        // currentWerr = self.calcError(mostSimilar, pos);
                     }
 
                     // TODO: verify if this is correct or if Werr = Werr(newMusic) + Werr(mostSimilar).
-                    var currentWerr = self.calcError(newMusic, musicList);
-                    if(currentWerr < bestWerr || (currentWerr == bestWerr && occupancy > self.ibb.isPosOccupied(pos))) {
-                        bestWerr = currentWerr;
-                        bestMsPos = self.ibb.getPos(mostSimilar.objId);
-                        bestNcPos = self.ibb.getPos(newMusic.objId);
-                        bestState = state;
-                        occupancy = self.ibb.isPosOccupied(pos);
+                    currentWerr = self.calcError(newMusic, musicList) + self.calcError(mostSimilar, musicList);
+                    countingError = null;
+                    if(currentWerr <= bestWerr) {
+                        var skip = false;
+
+
+                        if (currentWerr == bestWerr) {
+                            console.log("COUNTING ERROR WAS USED");
+                            countingError = self.calcCountingError(newMusic, musicList) + self.calcCountingError(mostSimilar, musicList);
+                            if (countingError >= bestCountingError) {
+                                skip = true;
+                            }
+                        }
+                        if (!skip) {
+                            bestWerr = currentWerr;
+                            bestCountingError = null === countingError ? bestCountingError : countingError;
+                            bestMsPos = self.ibb.getPos(mostSimilar.objId);
+                            bestNcPos = self.ibb.getPos(newMusic.objId);
+                            bestState = state;
+                            occupancy = self.ibb.isPosOccupied(pos);
+                        }
                     }
                 }
             });
@@ -261,7 +310,7 @@
             ret,
             rand = Math.floor(Math.random() * 1000);
 
-        console.log('INSERT ' + v.objId + ' - ' + rand + ' BEGIN');
+        // console.log('INSERT ' + v.objId + ' - ' + rand + ' BEGIN');
 
         // Verify if element ins't already inserted.
         if (this.ibb.getByObjId(v.objId) !== undefined) {
@@ -295,7 +344,7 @@
             this.ibb.flushDraw();
             ret = true;
         }
-        console.log('INSERT ' + v.objId + ' - ' + rand + ' END');
+        // console.log('INSERT ' + v.objId + ' - ' + rand + ' END');
 
         return ret;
     }
@@ -303,6 +352,32 @@
     IncBoard.prototype.posToString = function (pos) {
         return "(" + pos[0] + "," + pos[1] + ")";
     };
+
+    IncBoard.prototype.quality = function() {
+        var idList = this.ibb.getIdList(),
+            total = 0,
+            self = this;
+
+        for (var i in idList) {
+            console.log(idList[i]);
+            var item = this.ibb.getByObjId(idList[i]),
+                center = item.getPos();
+            $.item = item;
+
+
+            this.shiftList.forEach(function(shift) {
+                var pos = [center[0] + shift[0], center[1] + shift[1]];
+                for (var key in self.ibb.getByPos(pos)) {
+                    var item2 = self.ibb.getByPos(pos)[key],
+                        item = $.item.content;
+
+                    total += self.similarity[item.objId][item2.objId];
+                }
+            });
+        }
+
+        return parseInt(total / this.ibb.getIdList().length);
+    }
 
     $.IncBoard = IncBoard;
 
