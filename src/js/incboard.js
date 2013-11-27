@@ -81,27 +81,43 @@
         }
 
         this.shiftList.forEach(function(shift) {
-            var pos = [center[0] + shift[0], center[1] + shift[1]];
-            for (var key in self.ibb.getByPos(pos)) {
-                var item = self.ibb.getByPos(pos)[key],
-                    id = parseInt(item.objId);
+            self.shiftList.forEach(function(shift2) {
+                var pos = [center[0] + shift[0] + shift2[0], center[1] + shift[1] + shift2[1]];
+                for (var key in self.ibb.getByPos(pos)) {
+                    var item = self.ibb.getByPos(pos)[key],
+                        id = parseInt(item.objId);
 
-                if (-1 === list.indexOf(id)) {
-                    list.push(id);
-                    idList.splice(idList.indexOf(id), 1);
+                    if (-1 === list.indexOf(id)) {
+                        list.push(id);
+                        idList.splice(idList.indexOf(id), 1);
+                    }
                 }
-            }
+            });
         });
 
+
+        /*
+        // Add every element on list.
+        while (idList.length > 0) {
+            var id = parseInt(idList[0]);
+
+            if (-1 === list.indexOf(id)) {
+                list.push(id);
+            }
+            idList.splice(0, 1);
+        }
+
+        // Add up to this.stochasticLength
         while (list.length < this.stochasticLength * totalLength && idList.length > 0) {
             var rid = Math.floor(Math.random() * idList.length),
                 id = parseInt(idList[rid]);
 
             if (-1 === list.indexOf(id)) {
                 list.push(id);
-                idList.splice(rid, 1);
             }
+            idList.splice(rid, 1);
         }
+        */
 
         var end = new Date().getTime();
 
@@ -190,9 +206,10 @@
             var item = rank2D[r2];
             rN = rankND.indexOf(item);
             if (rN != r2) {
-                werr += Math.abs((rN - r2) * (self.ibb.getSize() - rN));
+                werr += Math.abs((rN - r2) * (musicList.length - rN));
             }
         }
+
 
         var s3 = new Date().getTime();
 
@@ -214,6 +231,7 @@
             }
         }
 
+        return 0;
         return cerr;
     }
 
