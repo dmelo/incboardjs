@@ -321,7 +321,8 @@
      *  Insert the object (music or album) on the incBoard.
      */
     IncBoard.prototype.insert = function(v) {
-        var maxSimilarity = -1,
+        var start = new Date().getTime(),
+            maxSimilarity = -1,
             mostSimilar = null,
             nSwitches = 0,
             self = this,
@@ -362,6 +363,9 @@
             this.ibb.flushDraw();
             ret = true;
         }
+
+        end = new Date().getTime();
+        console.log("INCBOARD: insert element on " + (end - start) + "ms on board with " + this.ibb.getIdList().length + " elements");
         // console.log('INSERT ' + v.objId + ' - ' + rand + ' END');
 
         return ret;
