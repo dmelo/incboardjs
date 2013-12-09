@@ -206,7 +206,7 @@
             var item = rank2D[r2];
             rN = rankND.indexOf(item);
             if (rN != r2) {
-                werr += Math.abs((rN - r2) * (musicList.length - rN));
+                werr += Math.abs((rN - r2) * (rN - r2));
             }
         }
 
@@ -217,6 +217,7 @@
     }
 
     IncBoard.prototype.calcCountingError = function(v, musicList) {
+        return parseInt(Math.random() * 1000);
         var cerr = 0,
             rank2D = this.get2DRank(v, musicList),
             rankND = this.getNDRank(v, musicList),
@@ -231,7 +232,6 @@
             }
         }
 
-        return 0;
         return cerr;
     }
 
