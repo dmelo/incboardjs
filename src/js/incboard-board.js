@@ -24,8 +24,8 @@
     function IncBoardBoard() {
         var rows = 7,
             cols = 14,
-            cellSizeX = 56,
-            cellSizeY = 44,
+            cellSizeX = 68,
+            cellSizeY = 51,
             /* cellSizeX = 120,
             cellSizeY = 90, */
             listByObjId = [], // Have a list of the all indexed by the ObjId
@@ -271,7 +271,7 @@
                 var boundaries;
 
                 cols = parseInt( ( $(window).width() - leftPadding ) / cellSizeX );
-                rows = parseInt( ( $(window).height() - topPadding - $('form.search').offset().top - $('.footer').height() ) / cellSizeY );
+                rows = parseInt( ( $(window).height() - topPadding - $('form#incboard-search').offset().top - $('.footer').height() ) / cellSizeY );
 
                 this.removeOutOfBorder();
                 this.centralizeItems();
