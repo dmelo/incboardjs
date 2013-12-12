@@ -21,7 +21,7 @@
 
 (function ($, undefined) {
     function IncBoard() {
-        this.shiftList = [[-1, -1], [0, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1]];
+        this.shiftList = [[1, -1], [-1, 0], [1, 0], [-1, 1], [0, 1], [1, 1], [-1, -1], [0, -1]];
         this.ibb = new $.IncBoardBoard();
         this.stochasticLength = 0;
         this.clean();
@@ -277,7 +277,7 @@
                         if (currentWerr == bestWerr) {
                             console.log("COUNTING ERROR WAS USED");
                             countingError = self.calcCountingError(newMusic, musicList) + self.calcCountingError(mostSimilar, musicList);
-                            if (countingError >= bestCountingError) {
+                            if (countingError > bestCountingError) {
                                 skip = true;
                             }
                         }
