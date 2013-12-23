@@ -34,6 +34,27 @@
         this.ibb.clean();
     };
 
+    IncBoard.prototype.nextPos = function(p) {
+        var ret = [0, 0],
+            layer = Math.max(Math.abs(p[0]), Math.abs(p[1]));
+
+        if (0 == p[0] && 0 == p[1]) { // first element
+            ret = [1, -1];
+        } else if (layer - 1 == p[0] && layer * -1 == p[1]) { // next layer
+            ret = [layer + 1, (-1 * layer) - 1];
+        } else if (p[0] == layer && p[1] < layer) { // first line
+            ret = [layer, p[1] + 1];
+        } else if (p[1] == layer && p[0] > -1 * layer) { // second line
+            ret = [p[0] - 1, layer];
+        } else if (p[0] == -1 * layer && p[1] > -1 * layer) { // third line
+            ret = [-1 * layer, p[1] - 1];
+        } else if (p[1] == -1 * layer && p[0] < layer) { // fourth line
+            ret = [p[0] + 1, -1 * layer];
+        }
+
+        return ret;
+    };
+
     IncBoard.prototype.getIdList = function() {
         return this.ibb.getIdList();
     };
