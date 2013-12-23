@@ -268,10 +268,12 @@
 
         this.resize = function() {
             if ($('form.search').length > 0) {
-                var boundaries;
+                var boundaries,
+                    formHeight = 1 === $('form#incboard-search').length ?
+                        $('form#incboard-search').offset().top : 0;
 
                 cols = parseInt( ( $(window).width() - leftPadding ) / cellSizeX );
-                rows = parseInt( ( $(window).height() - topPadding - $('form#incboard-search').offset().top - $('.footer').height() ) / cellSizeY );
+                rows = parseInt( ( $(window).height() - topPadding - formHeight - $('.footer').height() ) / cellSizeY );
 
                 this.removeOutOfBorder();
                 this.centralizeItems();
