@@ -31,7 +31,7 @@
             listByObjId = [], // Have a list of the all indexed by the ObjId
             listByPos = [], // Have a list of all cells indexed by it's position.
             size = 0,
-            topPadding = $('form.search').height() + 20,
+            topPadding = $('form.search').height() + $('form.search').position().top + 10,
             leftPadding = 127,
             drawList = [],
             log = new Log(),
@@ -273,7 +273,7 @@
                         $('form#incboard-search').offset().top : 0;
 
                 cols = parseInt( ( $(window).width() - leftPadding ) / cellSizeX );
-                rows = parseInt( ( $(window).height() - topPadding - formHeight - $('.footer').height() ) / cellSizeY );
+                rows = parseInt( ( $(window).height() - topPadding - $('.footer').height() ) / cellSizeY );
 
                 this.removeOutOfBorder();
                 this.centralizeItems();
