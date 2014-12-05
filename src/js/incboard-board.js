@@ -43,23 +43,25 @@
         };
 
         function animateCells() {
-            $('.incboard-cell').live('mouseover', function (e) {
+            $('body').delegate('.incboard-cell', 'mouseover', function (e) {
                 $('.incboard-img').css('display', 'block');
                 $('.incboard-cell').find('.inevidence').removeClass('inevidence');
                 $(this).find('.object-music').addClass('inevidence');
                 $(this).find('.incboard.img').css('display', 'none');
 
                 focusArtist($(this).attr('artist'));
-            }).live('mouseleave', function (e) {
+            });
+            
+            $('body').delegate('.incboard-cell', 'mouseleave', function (e) {
                 $('.incboard-img').css('display', 'block');
                 $('.incboard-cell').find('.inevidence').removeClass('inevidence');
                 $('.incboard-cell').removeClass('focus');
 
             });
 
-            $('#subtitle li').live('hover', function (e) {
+            $('body').delegate('#subtitle li', 'mouseover', function (e) {
                 focusArtist($(this).attr('artist'));
-            }).live('mouseleave', function (e) {
+            }).on('mouseleave', function (e) {
                 $('.incboard-cell').removeClass('focus');
             });
         };
