@@ -2,13 +2,6 @@
     "name": "incboardjs",
     "version": "1.0.0",
     "description": "Implementation of IncBoard",
-    "main": [
-        "./src/js/incboard-cell.js",
-        "./src/js/incboard.js",
-        "./src/js/incboard-board.js",
-        "./src/css",
-        "./src/css/incboard.css"
-    ],
     "dependencies": {
         "jquery": ">=2.0.0"
     }
